@@ -36,6 +36,5 @@ namespace Pressure.Domain
             }
             return Data;
         }
-
     }
 }

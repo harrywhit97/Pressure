@@ -81,7 +81,7 @@
             this.but_Start.TabIndex = 13;
             this.but_Start.Text = "START TEST";
             this.but_Start.UseVisualStyleBackColor = true;
-            this.but_Start.Click += new System.EventHandler(this.but_Start_Click);
+            this.but_Start.Click += new System.EventHandler(this.But_Start_Click);
             // 
             // but_EndSave
             // 
@@ -93,7 +93,7 @@
             this.but_EndSave.Text = "SAVE CURRENT";
             this.but_EndSave.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.but_EndSave.UseVisualStyleBackColor = true;
-            this.but_EndSave.Click += new System.EventHandler(this.but_EndSave_Click);
+            this.but_EndSave.Click += new System.EventHandler(this.But_EndSave_Click);
             // 
             // tbox_CurPPsi
             // 

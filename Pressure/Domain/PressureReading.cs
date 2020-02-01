@@ -22,5 +22,10 @@ namespace Pressure.Domain
             BAR = PressureCalculator.CalculateBAR(RawValue);
             Sensor = sensor;
         }
+
+        public string ToCsvString()
+        {
+            return $"{TimeStamp},{Sensor},{PSI},{BAR},{RawValue},";
+        }
     }
 }

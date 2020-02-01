@@ -7,6 +7,7 @@ using System.IO.Ports;
 using System.Diagnostics;
 using Pressure.Domain;
 using System.Timers;
+using System.Text;
 
 namespace Pressure
 {
@@ -15,62 +16,54 @@ namespace Pressure
 
         public Form1()
         {
-            
             InitializeComponent();
             GetPorts();
+            CsvString = new StringBuilder();
         }
 
-        #region Setup
         SerialReader Reader;
-        string portName = cmbo_Ports.Text;
-        private string serialData;
-        private double in_data;
-        private TimeSpan timeElapsed;
         System.Timers.Timer aTimer;
-        int i = 0;
-        Stopwatch stopwatch = new Stopwatch();
-        var Data_Arr = new List<string>();
-        Object lockingObj = new Object();
-        
+        StringBuilder CsvString;
 
-        #endregion
-        #region Button Assignment
-        public void but_Start_Click(object sender, EventArgs e)
+        public void But_Start_Click(object sender, EventArgs e)
         {
             try
             {
-                Reader = new SerialReader(cmbo_Ports.Text);
-                Reader.OpenPort();
-                stopwatch.Start();
-                SerialReader.
                 tbox_CurPBar.Text = "";
                 tbox_CurPPsi.Text = "";
                 tbox_Time.Text = "";
                 but_Start.Visible = false;
+                Reader = new SerialReader(cmbo_Ports.Text);
+                Reader.OpenPort();
+                SetTimer(1000);
             }
-            catch (Exception ex1)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex1.Message, "Error");
+                MessageBox.Show(ex.Message, "Error");
             }
-
         }
 
-        private void but_EndSave_Click(object sender, EventArgs e)
+        private void But_EndSave_Click(object sender, EventArgs e)
+        {
+            Reader.ClosePort();
+            Write(CsvString.ToString());
+            CsvString.Clear();
+        }
+
+        void Write(string data)
         {
             try
             {
-                Reader.ClosePort();
                 string pathfile = @"C:\Users\rap\Desktop\DATA\";
-                string filename = "New_Data.txt";
-                string csv = string.Join("\n", Data_Arr.Select(x => x.ToString()).ToArray());
+                string filename = "New_Data.txt";               
 
 
-                System.IO.File.WriteAllText(pathfile + filename, csv);
+                System.IO.File.WriteAllText(pathfile + filename, data);
                 MessageBox.Show("Data has been saved to " + pathfile);
             }
-            catch (Exception ex2)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex2.Message, "Error");
+                MessageBox.Show(ex.Message, "Error");
             }
         }
 
@@ -81,107 +74,31 @@ namespace Pressure
 
 
             Reader.OpenPort();
-            message = Reader.PortIsOpen ? $"Port {Reader.PortName} has been opened" 
+            message = Reader.PortIsOpen ? $"Port {Reader.PortName} has been opened"
                                                 : $"Port {Reader.PortName} could not be opened";
             Reader.ClosePort();
 
             MessageBox.Show(message);
         }
 
-
-
-        #endregion
-        #region UI
         private void GetPorts()
         {
-            string[] ports = SerialPort.GetPortNames();
-            cmbo_Ports.DataSource = ports;
+            cmbo_Ports.DataSource = SerialPort.GetPortNames();
         }
 
-
-        private void displaydata_event(object sender, EventArgs e)
+        private void SetTimer(int timerLength)
         {
-            string[] dataOut;
-            dataOut = convertData(in_data);
-            if (testBegun())
-            {
-                tbox_Time.Text = dataOut[0];
-            }
-            else
-            {
-                tbox_Time.Text = "Test not started";
-            }
-            tbox_CurPBar.Text = dataOut[1];
-            tbox_CurPPsi.Text = dataOut[2];
-        }
-
-        private bool testBegun()
-        {
-            bool result;
-            if (stopwatch.IsRunning)
-            {
-                result = true;
-            }
-            else
-            {
-                result = false;
-            }
-            return result;
-        }
-
-
-        #endregion
-        #region Data Manipulation
-
-
-        private string[] convertData(double in_data)
-        {
-            double voltMax = 4.24;  //Voltage on arduino at 10V/16bar
-            double ardMax = 5;      //Max voltage into arduino
-            double barMaxP = 16;
-            double psiMaxP = 232;
-            double psiCur;
-            double barCur;
-            double ardTotIntervals = 1024;
-            var dataOut = new string[4];
-
-            //Convert to bar
-            barCur = Math.Round(((in_data / ardTotIntervals) * (barMaxP / voltMax)) * ardMax, 1, MidpointRounding.AwayFromZero);
-            //Convert to psi
-            psiCur = Math.Round(((in_data / ardTotIntervals) * (psiMaxP / voltMax)) * ardMax, 1, MidpointRounding.AwayFromZero);
-            //Get current timestamp
-            timeElapsed = RoundSeconds(stopwatch.Elapsed);
-            //Compile output array
-            dataOut[0] = Convert.ToString(timeElapsed);
-            dataOut[1] = Convert.ToString(barCur);
-            dataOut[2] = Convert.ToString(psiCur);
-            dataOut[3] = Convert.ToString(in_data);
-
-            return dataOut;
-
-        }
-
-        public static TimeSpan RoundSeconds(TimeSpan span)
-        {
-            return TimeSpan.FromSeconds(Math.Round((span.TotalSeconds)));
-        }
-        #endregion
-
-
-        private void SetTimer()
-        {
-            // Create a timer with a two second interval.
-            aTimer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += OnTimedEvent;
+            aTimer = new System.Timers.Timer(timerLength);
+            aTimer.Elapsed += ReadAndParseData;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
         }
 
-        private  void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private void ReadAndParseData(Object source, ElapsedEventArgs e)
         {
             var serialData = Reader.ReadLineData();
             var readings = SerialDataToPressureReading(serialData);
+            readings.ForEach(x => CsvString.Append($"{x.ToString()}\n"));
         }
 
         List<PressureReading> SerialDataToPressureReading(Domain.SerialData serialData)
@@ -194,7 +111,4 @@ namespace Pressure
             return readings;
         }
     }
-}  
-  
-
-
+}
