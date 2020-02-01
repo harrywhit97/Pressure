@@ -74,8 +74,10 @@ namespace Pressure.Domain
         
         public SerialData ReadLineData()
         {
-            var data = Port.ReadLine();
-            return new SerialData(DateTimeOffset.UtcNow, data);
+            var dataLine = Port.ReadLine();
+            var data = new SerialData(DateTimeOffset.UtcNow, dataLine);
+            data.Decode();
+            return data;
         }
 
         public string ReadLine()

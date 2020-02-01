@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Diagnostics;
-using System.Threading;
-using System.Management;
 using Pressure.Domain;
 
 namespace Pressure
 {
     public partial class Form1 : Form
     {
-
 
         public Form1()
         {
@@ -26,53 +20,19 @@ namespace Pressure
         }
 
         #region Setup
-        private SerialPort Port;
         private string serialData;
         private double in_data;
         private TimeSpan timeElapsed;
         int i = 0;
         Stopwatch stopwatch = new Stopwatch();
-        List<string> Data_Arr = new List<string>();
+        var Data_Arr = new List<string>();
         Object lockingObj = new Object();
-
-        public void chkPort()
-        {
-            if (Port == null)
-            {
-                Port = new SerialPort
-                {
-                    PortName = cmbo_Ports.Text,
-                    Parity = Parity.None,
-                    BaudRate = 9600,
-                    DataBits = 8,
-                    StopBits = StopBits.One
-                };
-                Port.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived);
-                Port.ReadTimeout = 100;
-
-                try
-                {
-                    Port.Open();
-                    MessageBox.Show(String.Format("Port {0} has been opened",  Port.PortName));
-                }
-
-                catch (Exception ex3)
-                {
-                    MessageBox.Show(ex3.Message, "Error");
-                }
-            }
-            else
-            {
-                MessageBox.Show(String.Format("Port {0} is currently open, restart application to change", Port.PortName));
-            }
-        }
+        
 
         #endregion
         #region Button Assignment
         public void but_Start_Click(object sender, EventArgs e)
         {
-
-
             try
             {
                 stopwatch.Start();
@@ -109,8 +69,6 @@ namespace Pressure
 
         private void but_Check_Click(object sender, EventArgs e)
         {
-            //chkPort();
-
             var reader = new SerialReader(cmbo_Ports.Text);
             string message;
 
@@ -118,7 +76,7 @@ namespace Pressure
             reader.OpenPort();
             message = reader.PortIsOpen ? $"Port {reader.PortName} has been opened" 
                                                 : $"Port {reader.PortName} could not be opened";
-            //reader.ClosePort();
+            reader.ClosePort();
 
             MessageBox.Show(message);
         }
@@ -167,30 +125,7 @@ namespace Pressure
 
         #endregion
         #region Data Manipulation
-        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            
-            lock (lockingObj)
-            {
-                int dataInterval = 60;
-                try
-                {
-                    serialData = Port.ReadLine();
-                    in_data = Convert.ToDouble(serialData);
-                    if ((i - 1) % dataInterval == 0)
-                    {
-                        Data_Arr.Add(string.Join(",", convertData(in_data)));
-                    }
 
-                    this.BeginInvoke(new EventHandler(displaydata_event));
-                    i++;
-                }
-                catch (Exception ex4)
-                {
-                    MessageBox.Show(ex4.Message, "Error");
-                }
-            }
-        }
 
         private string[] convertData(double in_data)
         {
@@ -201,7 +136,7 @@ namespace Pressure
             double psiCur;
             double barCur;
             double ardTotIntervals = 1024;
-            string[] dataOut = new string[4];
+            var dataOut = new string[4];
 
             //Convert to bar
             barCur = Math.Round(((in_data / ardTotIntervals) * (barMaxP / voltMax)) * ardMax, 1, MidpointRounding.AwayFromZero);
@@ -225,11 +160,6 @@ namespace Pressure
         }
         #endregion
 
-
-
-
-
-        
 
         
     }
