@@ -39,15 +39,18 @@ namespace Pressure.Domain
 
         SerialPort GetSerialPort()
         {
-            return new SerialPort()
+            var port =  new SerialPort()
             {
                 PortName = PortName,
                 Parity = Parity,
                 BaudRate = BaudRate,
                 DataBits = DataBits,
                 StopBits = StopBits,
-                ReadTimeout = ReadTimeout
+                ReadTimeout = ReadTimeout,
+                
             };
+            port.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived);
+            return port;
         }
 
         public bool OpenPort()
@@ -78,26 +81,6 @@ namespace Pressure.Domain
         public string ReadLine()
         {
             return Port.ReadLine();
-        }
-
-        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            int dataInterval = 60;
-            try
-            {
-                var in_data = Convert.ToDouble(Port.ReadLine(0));
-                if ((i - 1) % dataInterval == 0)
-                {
-                    Data_Arr.Add(string.Join(",", convertData(in_data)));
-                }
-
-                this.BeginInvoke(new EventHandler(displaydata_event));
-                i++;
-            }
-            catch (Exception ex4)
-            {
-                MessageBox.Show(ex4.Message, "Error");
-            }
         }
     }
 }
