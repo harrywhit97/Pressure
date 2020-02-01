@@ -18,9 +18,10 @@ namespace Pressure.Domain
             TimeStamp = timeStamp;
             RawData = rawData;
             Data = new Dictionary<string, int>();
+            Decode();
         }
 
-        public Dictionary<string, int> Decode()
+        Dictionary<string, int> Decode()
         {
             var dataSeparated = RawData.Split(',');
 

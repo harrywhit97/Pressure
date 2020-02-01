@@ -39,7 +39,7 @@ namespace Pressure.Domain
 
         SerialPort GetSerialPort()
         {
-            var port =  new SerialPort()
+            return new SerialPort()
             {
                 PortName = PortName,
                 Parity = Parity,
@@ -49,8 +49,6 @@ namespace Pressure.Domain
                 ReadTimeout = ReadTimeout,
                 
             };
-            port.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived);
-            return port;
         }
 
         public bool OpenPort()

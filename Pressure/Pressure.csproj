@@ -75,6 +75,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\PressureCalculator.cs" />
+    <Compile Include="Domain\PressureReading.cs" />
     <Compile Include="Domain\SerialData.cs" />
     <Compile Include="Domain\SerialReader.cs" />
     <Compile Include="Form1.cs">

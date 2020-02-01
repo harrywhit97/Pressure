@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Diagnostics;
 using Pressure.Domain;
+using System.Timers;
 
 namespace Pressure
 {
@@ -16,13 +17,16 @@ namespace Pressure
         {
             
             InitializeComponent();
-            getPorts();
+            GetPorts();
         }
 
         #region Setup
+        SerialReader Reader;
+        string portName = cmbo_Ports.Text;
         private string serialData;
         private double in_data;
         private TimeSpan timeElapsed;
+        System.Timers.Timer aTimer;
         int i = 0;
         Stopwatch stopwatch = new Stopwatch();
         var Data_Arr = new List<string>();
@@ -35,7 +39,10 @@ namespace Pressure
         {
             try
             {
+                Reader = new SerialReader(cmbo_Ports.Text);
+                Reader.OpenPort();
                 stopwatch.Start();
+                SerialReader.
                 tbox_CurPBar.Text = "";
                 tbox_CurPPsi.Text = "";
                 tbox_Time.Text = "";
@@ -52,7 +59,7 @@ namespace Pressure
         {
             try
             {
-                Port.Close();
+                Reader.ClosePort();
                 string pathfile = @"C:\Users\rap\Desktop\DATA\";
                 string filename = "New_Data.txt";
                 string csv = string.Join("\n", Data_Arr.Select(x => x.ToString()).ToArray());
@@ -69,14 +76,14 @@ namespace Pressure
 
         private void but_Check_Click(object sender, EventArgs e)
         {
-            var reader = new SerialReader(cmbo_Ports.Text);
+            Reader = new SerialReader(cmbo_Ports.Text);
             string message;
 
 
-            reader.OpenPort();
-            message = reader.PortIsOpen ? $"Port {reader.PortName} has been opened" 
-                                                : $"Port {reader.PortName} could not be opened";
-            reader.ClosePort();
+            Reader.OpenPort();
+            message = Reader.PortIsOpen ? $"Port {Reader.PortName} has been opened" 
+                                                : $"Port {Reader.PortName} could not be opened";
+            Reader.ClosePort();
 
             MessageBox.Show(message);
         }
@@ -85,7 +92,7 @@ namespace Pressure
 
         #endregion
         #region UI
-        private void getPorts()
+        private void GetPorts()
         {
             string[] ports = SerialPort.GetPortNames();
             cmbo_Ports.DataSource = ports;
@@ -161,7 +168,31 @@ namespace Pressure
         #endregion
 
 
-        
+        private void SetTimer()
+        {
+            // Create a timer with a two second interval.
+            aTimer = new System.Timers.Timer(2000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += OnTimedEvent;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+        }
+
+        private  void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            var serialData = Reader.ReadLineData();
+            var readings = SerialDataToPressureReading(serialData);
+        }
+
+        List<PressureReading> SerialDataToPressureReading(Domain.SerialData serialData)
+        {
+            var readings = new List<PressureReading>();
+
+            foreach (var key in serialData.Data.Keys)
+                readings.Add(new PressureReading(key, serialData.Data[key], serialData.TimeStamp));
+
+            return readings;
+        }
     }
 }  
   
