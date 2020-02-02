@@ -70,13 +70,6 @@ namespace PressureCore.Concrete
         {
             Port.Close();
         }
-        
-        public Domain.SerialData ReadData(DateTimeOffset now)
-        {
-            var dataLine = Port.ReadLine();
-            var data = new Domain.SerialData(now, dataLine);
-            return data;
-        }
 
         public string ReadLine()
         {

@@ -8,30 +8,71 @@ using PressureCore.Concrete;
 using OutPutWriter.Enums;
 using OutPutWriter.Interfaces;
 using System.IO.Ports;
+using System.Configuration;
+using System.ComponentModel;
 
 namespace Pressure
 {
     public partial class Form1 : Form
     {
-        public Form1()
-        {
-            InitializeComponent();
-            GetPorts();
-            Readings = new List<PressureReading>();
-            OutputWriter = OutPutWriterFactory.GetOutputWriter(OutputWriterType, WriteFolder);
-
-            //find these numbers elsewhere - maybe appconfig
-            Calculator = new PressureCalculator(4.24, 16, 5, 024);
-        }
-
         SerialReader Reader;
         System.Timers.Timer aTimer;
         readonly IList<PressureReading> Readings;
-        const int BatchSize = 100;
-        const OutputType  OutputWriterType = OutputType.CSV;
-        const string WriteFolder = @"C:\Users\rap\Desktop\DATA\";
+        readonly int BatchSize;
+        readonly OutputType OutputWriterType;
+        readonly string OutputDestinationFolder;
         readonly PressureCalculator Calculator;
-        readonly IOutputWriter OutputWriter; 
+        readonly IOutputWriter OutputWriter;
+
+        public Form1()
+        {
+            BatchSize = GetAppSettingAndConvert<int>(nameof(BatchSize));
+            OutputDestinationFolder = GetAppSetting(nameof(OutputDestinationFolder));
+
+            InitializeComponent();
+            GetPorts();
+
+            Readings = new List<PressureReading>();
+            OutputWriter = OutPutWriterFactory.GetOutputWriter(OutputWriterType, OutputDestinationFolder);
+            Calculator = BuildPressureCalculator();
+            OutputWriterType = OutputType.CSV;
+        }
+
+        PressureCalculator BuildPressureCalculator()
+        {
+            return new PressureCalculator()
+            {
+                MaxVoltage = GetAppSettingAndConvert<double>(nameof(PressureCalculator.MaxVoltage)),
+                ArduinoMaxVoltage = GetAppSettingAndConvert<int>(nameof(PressureCalculator.ArduinoMaxVoltage)),
+                ArduinoTotalIntervals = GetAppSettingAndConvert<int>(nameof(PressureCalculator.ArduinoTotalIntervals)),
+                BARMax = GetAppSettingAndConvert<double>(nameof(PressureCalculator.BARMax))
+            };
+        }
+
+        T GetAppSettingAndConvert<T>(string settingName)
+        {
+            var setting = GetAppSetting(settingName);
+
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(typeof(T));
+                return (T)converter.ConvertFromString(setting);                    
+            }
+            catch
+            {
+                throw new Exception($"{settingName} is not a {typeof(T).ToString()} in the configuration setings");
+            }
+        }
+
+        string GetAppSetting(string settingName)
+        {
+            var setting = ConfigurationManager.AppSettings.Get(settingName);
+
+            if (setting is null)
+                throw new Exception($"{settingName} could not be found in the configuration settings");
+
+            return setting;
+        }
 
         public void But_Start_Click(object sender, EventArgs e)
         {
@@ -86,8 +127,8 @@ namespace Pressure
 
         void ReadAndParseData(object source, ElapsedEventArgs e)
         {
-            var serialData = Reader.ReadData(DateTimeOffset.UtcNow);
-            var readings = SerialDataToPressureReading(serialData);
+            var line = Reader.ReadLine();
+            var readings = RawDataProcessor.ParseRawDataToPressureReadings(line, Calculator, DateTimeOffset.UtcNow);
             readings.ForEach(x => Readings.Add(x));
 
             if(Readings.Count >= BatchSize)
@@ -100,26 +141,6 @@ namespace Pressure
                 Readings.Clear();
             else
                 MessageBox.Show("Error writing to file");
-        }
-
-        List<PressureReading> SerialDataToPressureReading(PressureCore.Domain.SerialData serialData)
-        {
-            var readings = new List<PressureReading>();
-
-            foreach (var key in serialData.Data.Keys)
-            {
-                var rawValue = serialData.Data[key];
-                var reading = new PressureReading
-                {
-                    SensorName = key,
-                    RawValue = rawValue,
-                    TimeStamp = serialData.TimeStamp,
-                    PSI = Calculator.CalculatePSI(rawValue),
-                    BAR = Calculator.CalculateBAR(rawValue)
-                };
-                readings.Add(reading);
-            }
-            return readings;
-        }
+        }        
     }
 }

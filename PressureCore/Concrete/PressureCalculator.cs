@@ -12,14 +12,6 @@ namespace PressureCore.Concrete
         public double BARMax { get; set; }
         public int ArduinoTotalIntervals { get; set; }
 
-        public PressureCalculator(double maxVoltage, double barMax, int arduinoMaxVoltage, int arduinoTotalIntervals)
-        {
-            MaxVoltage = maxVoltage;
-            BARMax = barMax;
-            ArduinoMaxVoltage = arduinoMaxVoltage;
-            ArduinoTotalIntervals = arduinoTotalIntervals;
-        }
-
         public double CalculatePSI(int RawReading)
         {            
             return Calculate(RawReading, BARtoPSI(BARMax));

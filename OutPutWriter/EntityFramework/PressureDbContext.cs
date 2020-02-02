@@ -1,5 +1,7 @@
 ﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using System.Linq;
 
 namespace Pressure.EF
 {
@@ -9,10 +11,12 @@ namespace Pressure.EF
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-                @"Server=.\mssqllocaldb;Database=Pressure;Integrated Security=True");
+            optionsBuilder.UseSqlServer("Server =.; Database = test; Trusted_Connection = True; MultipleActiveResultSets = True");
         }
 
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

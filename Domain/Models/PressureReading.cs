@@ -4,6 +4,7 @@ namespace Domain.Models
 {
     public class PressureReading
     {
+        public long Id { get; set; }
         public int RawValue { get; set; }
         public double PSI { get; set; }
         public double BAR { get; set; }
