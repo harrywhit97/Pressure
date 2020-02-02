@@ -12,12 +12,14 @@ namespace PressureCore.Concrete
         public double BARMax { get; set; }
         public int ArduinoTotalIntervals { get; set; }
 
-        public double CalculatePSI(int RawReading)
+        const double BARtoPSIRatio = 14.504;
+
+        public virtual double CalculatePSI(int RawReading)
         {            
             return Calculate(RawReading, BARtoPSI(BARMax));
         }
 
-        public double CalculateBAR(int RawReading)
+        public virtual double CalculateBAR(int RawReading)
         {
             return Calculate(RawReading, BARMax);
         }
@@ -29,7 +31,6 @@ namespace PressureCore.Concrete
 
         double BARtoPSI(double BAR)
         {
-            var BARtoPSIRatio = 14.504;
             return BAR * BARtoPSIRatio;
         }
     }

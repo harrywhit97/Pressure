@@ -16,17 +16,20 @@ namespace Pressure
     public partial class Form1 : Form
     {
         SerialReader Reader;
-        System.Timers.Timer aTimer;
+        string PortName => cmbo_Ports.Text;
+        System.Timers.Timer ReadTimer;
         readonly IList<PressureReading> Readings;
         readonly int BatchSize;
         readonly OutputType OutputWriterType;
         readonly string OutputDestinationFolder;
         readonly PressureCalculator Calculator;
         readonly IOutputWriter OutputWriter;
+        readonly int ReadFrequencyInMilliseconds;
 
         public Form1()
         {
             BatchSize = GetAppSettingAndConvert<int>(nameof(BatchSize));
+            ReadFrequencyInMilliseconds = GetAppSettingAndConvert<int>(nameof(ReadFrequencyInMilliseconds));
             OutputDestinationFolder = GetAppSetting(nameof(OutputDestinationFolder));
 
             InitializeComponent();
@@ -82,9 +85,9 @@ namespace Pressure
                 tbox_CurPPsi.Text = "";
                 tbox_Time.Text = "";
                 but_Start.Visible = false;
-                Reader = new SerialReader(cmbo_Ports.Text);
+                Reader = new SerialReader(PortName);
                 Reader.OpenPort();
-                SetTimer(1000);
+                SetTimer(ReadFrequencyInMilliseconds);
             }
             catch (Exception ex)
             {
@@ -119,10 +122,10 @@ namespace Pressure
 
         void SetTimer(int timerLength)
         {
-            aTimer = new System.Timers.Timer(timerLength);
-            aTimer.Elapsed += ReadAndParseData;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
+            ReadTimer = new System.Timers.Timer(timerLength);
+            ReadTimer.Elapsed += ReadAndParseData;
+            ReadTimer.AutoReset = true;
+            ReadTimer.Enabled = true;
         }
 
         void ReadAndParseData(object source, ElapsedEventArgs e)

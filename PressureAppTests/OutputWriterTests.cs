@@ -28,11 +28,6 @@ namespace PressureAppTests
 
             var list = new List<PressureReading>() { reading };
 
-            // Act
-            repo.SavePressureReadings(list);
-
-            // Assert
-            var record = repo.GetRecords();
             
         }
 
