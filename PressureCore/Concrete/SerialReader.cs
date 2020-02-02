@@ -1,9 +1,10 @@
-﻿using System;
+﻿using PressureCore.Interfaces;
+using System;
 using System.IO.Ports;
 
-namespace Pressure.Domain
+namespace PressureCore.Concrete
 {
-    public class SerialReader
+    public class SerialReader : ISerialReader
     {
         SerialPort Port { get; set; }
         public Parity Parity { get; set; }
@@ -70,11 +71,10 @@ namespace Pressure.Domain
             Port.Close();
         }
         
-        public SerialData ReadLineData()
+        public Domain.SerialData ReadData(DateTimeOffset now)
         {
             var dataLine = Port.ReadLine();
-            var data = new SerialData(DateTimeOffset.UtcNow, dataLine);
-            data.Decode();
+            var data = new Domain.SerialData(now, dataLine);
             return data;
         }
 

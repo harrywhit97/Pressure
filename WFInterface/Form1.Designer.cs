@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            //System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            //System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            //System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.tbox_CurPBar = new System.Windows.Forms.TextBox();
             this.but_Start = new System.Windows.Forms.Button();
@@ -45,12 +45,12 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tBox_TstName = new System.Windows.Forms.TextBox();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            //this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.but_Check = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            //((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -200,19 +200,19 @@
             // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(547, 36);
-            this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(580, 325);
-            this.chart1.TabIndex = 27;
-            this.chart1.Text = "chart1";
+            //chartArea1.Name = "ChartArea1";
+            //this.chart1.ChartAreas.Add(chartArea1);
+            //legend1.Name = "Legend1";
+            //this.chart1.Legends.Add(legend1);
+            //this.chart1.Location = new System.Drawing.Point(547, 36);
+            //this.chart1.Name = "chart1";
+            //series1.ChartArea = "ChartArea1";
+            //series1.Legend = "Legend1";
+            //series1.Name = "Series1";
+            //this.chart1.Series.Add(series1);
+            //this.chart1.Size = new System.Drawing.Size(580, 325);
+            //this.chart1.TabIndex = 27;
+            //this.chart1.Text = "chart1";
             // 
             // label7
             // 
@@ -255,7 +255,7 @@
             this.but_Check.Text = "CHECK";
             this.but_Check.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.but_Check.UseVisualStyleBackColor = true;
-            this.but_Check.Click += new System.EventHandler(this.but_Check_Click);
+            this.but_Check.Click += new System.EventHandler(this.But_Check_Click);
             // 
             // Form1
             // 
@@ -266,7 +266,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.chart1);
+            //this.Controls.Add(this.chart1);
             this.Controls.Add(this.tBox_TstName);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.comboBox1);
@@ -285,7 +285,7 @@
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "Form1";
             this.Text = "Pressure Measurement";
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            //((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -307,7 +307,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox tBox_TstName;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        //private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button1;
