@@ -45,10 +45,10 @@ namespace Pressure
         {
             return new PressureCalculator()
             {
-                MaxVoltage = GetAppSettingAndConvert<double>(nameof(PressureCalculator.MaxVoltage)),
+                MaxVoltage = GetAppSettingAndConvert<decimal>(nameof(PressureCalculator.MaxVoltage)),
                 ArduinoMaxVoltage = GetAppSettingAndConvert<int>(nameof(PressureCalculator.ArduinoMaxVoltage)),
                 ArduinoTotalIntervals = GetAppSettingAndConvert<int>(nameof(PressureCalculator.ArduinoTotalIntervals)),
-                BARMax = GetAppSettingAndConvert<double>(nameof(PressureCalculator.BARMax))
+                BARMax = GetAppSettingAndConvert<decimal>(nameof(PressureCalculator.BARMax))
             };
         }
 

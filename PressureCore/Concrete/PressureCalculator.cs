@@ -7,29 +7,29 @@ namespace PressureCore.Concrete
         /// <summary>
         /// Voltage on arduino at 10V/16bar
         /// </summary>
-        public double MaxVoltage { get; set; }
+        public decimal MaxVoltage { get; set; }
         public int ArduinoMaxVoltage { get; set; }
-        public double BARMax { get; set; }
+        public decimal BARMax { get; set; }
         public int ArduinoTotalIntervals { get; set; }
 
-        const double BARtoPSIRatio = 14.504;
+        const decimal BARtoPSIRatio = 14.504M;
 
-        public virtual double CalculatePSI(int RawReading)
+        public virtual decimal CalculatePSI(decimal RawReading)
         {            
             return Calculate(RawReading, BARtoPSI(BARMax));
         }
 
-        public virtual double CalculateBAR(int RawReading)
+        public virtual decimal CalculateBAR(decimal RawReading)
         {
             return Calculate(RawReading, BARMax);
         }
 
-        double Calculate(int RawReading, double maxP)
+        decimal Calculate(decimal RawReading, decimal maxP)
         {
             return Math.Round(((RawReading / ArduinoTotalIntervals) * (maxP / MaxVoltage)) * ArduinoMaxVoltage, 1, MidpointRounding.AwayFromZero);
         }
 
-        double BARtoPSI(double BAR)
+        decimal BARtoPSI(decimal BAR)
         {
             return BAR * BARtoPSIRatio;
         }

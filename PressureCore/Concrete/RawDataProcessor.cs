@@ -12,16 +12,16 @@ namespace PressureCore.Concrete
             return SerialDataToPressureReading(data, calculator, timestamp);
         }
 
-        static Dictionary<string, int> RawDataToDictionary(string rawData)
+        static Dictionary<string, decimal> RawDataToDictionary(string rawData)
         {
             var dataSeparated = rawData.Split(',');
-            var data = new Dictionary<string, int>();
+            var data = new Dictionary<string, decimal>();
 
             for (int i = 0; i < dataSeparated.Length; i += 2)
             {
                 var readingString = dataSeparated[i + 1];
 
-                if (!int.TryParse(readingString, out int reading))
+                if (!decimal.TryParse(readingString, out var reading))
                     throw new Exception($"Reading {readingString} is not an integer");
 
                 data.Add(dataSeparated[i], reading);
@@ -29,7 +29,7 @@ namespace PressureCore.Concrete
             return data;
         }
 
-        static List<PressureReading> SerialDataToPressureReading(Dictionary<string, int> data, PressureCalculator calculator, DateTimeOffset timestamp)
+        static List<PressureReading> SerialDataToPressureReading(Dictionary<string, decimal> data, PressureCalculator calculator, DateTimeOffset timestamp)
         {
             var readings = new List<PressureReading>();
 
@@ -48,6 +48,5 @@ namespace PressureCore.Concrete
             }
             return readings;
         }
-
     }
 }

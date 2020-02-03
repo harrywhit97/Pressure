@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PressureAppTests.Helpers;
 using PressureCore.Concrete;
 using System;
 
@@ -17,8 +18,8 @@ namespace PressureAppTests
             var timestamp = new DateTimeOffset(2020, 02, 02, 0, 0, 0, TimeSpan.Zero);
 
             var calculatorMock = new Mock<PressureCalculator>();
-            calculatorMock.Setup(x => x.CalculateBAR(It.IsAny<int>())).Returns(10);
-            calculatorMock.Setup(x => x.CalculatePSI(It.IsAny<int>())).Returns(11);
+            calculatorMock.Setup(x => x.CalculateBAR(It.IsAny<decimal>())).Returns(10.0M);
+            calculatorMock.Setup(x => x.CalculatePSI(It.IsAny<decimal>())).Returns(11.0M);
 
             // Act
             var readings = RawDataProcessor.ParseRawDataToPressureReadings(rawData, calculatorMock.Object, timestamp);
@@ -30,34 +31,41 @@ namespace PressureAppTests
             reading.RawValue.Should().Be(209);
             reading.TimeStamp.Should().Be(timestamp);
             reading.SensorName.Should().Be("A1");
-            reading.BAR.Should().Be(10);
-            reading.PSI.Should().Be(11);
+            reading.BAR.Should().Be(10.0M);
+            reading.PSI.Should().Be(11M);
 
             reading = readings[1];
-            reading.RawValue.Should().Be(549);
+            reading.RawValue.Should().Be(549M);
             reading.TimeStamp.Should().Be(timestamp);
             reading.SensorName.Should().Be("A2");
-            reading.BAR.Should().Be(10);
-            reading.PSI.Should().Be(11);
+            reading.BAR.Should().Be(10.0M);
+            reading.PSI.Should().Be(11.0M);
         }
 
         [TestMethod]
         public void PressureCalculator_correctly_calculates_PSI()
         {
             // Arrange
-            var calculator = new PressureCalculator()
-            {
-                ArduinoMaxVoltage = 5,
-                ArduinoTotalIntervals = 1024,
-                BARMax = 16,
-                MaxVoltage = 4.24
-            };
+            var calculator = PressureCalculatorHelper.BuildCalulator();
 
             // Act
-            var psi = calculator.CalculatePSI(723);
+            var psi = calculator.CalculatePSI(700M);
 
             // Assert
-            psi.Should().Be(1);
+            psi.Should().Be(187.1M);
+        }
+
+        [TestMethod]
+        public void PressureCalculator_correctly_calculates_BAR()
+        {
+            // Arrange
+            var calculator = PressureCalculatorHelper.BuildCalulator();
+
+            // Act
+            var BAR = calculator.CalculateBAR(700M);
+
+            // Assert
+            BAR.Should().Be(12.9M);
         }
     }
 }

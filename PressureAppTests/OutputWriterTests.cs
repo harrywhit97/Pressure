@@ -27,10 +27,6 @@ namespace PressureAppTests
             };
 
             var list = new List<PressureReading>() { reading };
-
-            
         }
-
-
     }
 }
